@@ -3,6 +3,9 @@ type InlineMarkup = "*" | "/" | "_" | "^" | ",";
 
 export function parseNorgToHtml(norgContent: string): string {
     const lines = norgContent.split("\n");
+    let inCodeBlock = false;
+    let codeBlockLanguage = "";
+    let codeBlockContent = "";
 
     let html = "";
     const stack: string[] = []; 
@@ -14,7 +17,7 @@ export function parseNorgToHtml(norgContent: string): string {
             html += `<h${level}>${escapeHtml(headingText)}</h${level}>\n`;
             continue;
         }
-
+    
         if (line.trim().startsWith("- ")) {
             if (!stack.includes("ul")) {
                 stack.push("ul");
@@ -22,7 +25,9 @@ export function parseNorgToHtml(norgContent: string): string {
             }
             html += `<li>${escapeHtml(line.trim().substring(2))}</li>\n`;
             continue;
-        } else if (line.trim().startsWith("~ ")) {
+        }
+    
+        if (line.trim().startsWith("~ ")) {
             if (!stack.includes("ol")) {
                 stack.push("ol");
                 html += "<ol>\n";
@@ -30,6 +35,7 @@ export function parseNorgToHtml(norgContent: string): string {
             html += `<li>${escapeHtml(line.trim().substring(2))}</li>\n`;
             continue;
         }
+    
 
         if (line.trim() === "" && stack.length > 0) {
             while (stack.length > 0) {
@@ -38,7 +44,27 @@ export function parseNorgToHtml(norgContent: string): string {
             }
             continue;
         }
-
+    
+        if (line.startsWith("@code")) {
+            const [, language] = line.match(/^@code\s+(\w+)/) || [];
+            inCodeBlock = true;
+            codeBlockLanguage = language || "plaintext";
+            codeBlockContent = "";
+            continue;
+        }
+    
+        if (inCodeBlock) {
+            if (line.startsWith("@end")) {
+                html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${escapeHtml(codeBlockContent)}</code></pre>\n`;
+                inCodeBlock = false;
+                codeBlockLanguage = "";
+                codeBlockContent = "";
+            } else {
+                codeBlockContent += (codeBlockContent ? "\n" : "") + line;
+            }
+            continue;
+        }
+    
         const taskMatch = line.trim().match(/^-\s\(([\sx\-=!+?_])\)\s(.+)/);
         if (taskMatch) {
             const [, state, taskText] = taskMatch;
@@ -46,13 +72,13 @@ export function parseNorgToHtml(norgContent: string): string {
             html += `<div class="task ${stateClass}">${escapeHtml(taskText)}</div>\n`;
             continue;
         }
-
+    
         const inlineMarkup = processInlineMarkup(line);
         if (inlineMarkup !== line) {
             html += `<p>${inlineMarkup}</p>\n`;
             continue;
         }
-
+    
         if (line.trim() !== "") {
             html += `<p>${escapeHtml(line.trim())}</p>\n`;
         }

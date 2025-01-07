@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import { join } from "path";
 import { renderPage } from "./render";
+import { execSync } from "child_process";
 
 const INPUT_DIR = join(__dirname, "../src/pages");
 const OUTPUT_DIR = join(__dirname, "../dist");
@@ -13,14 +14,15 @@ async function copyStaticAssets() {
     try {
         await fs.mkdir(OUTPUT_DIR, { recursive: true });
         await fs.copyFile(cssSource, cssDestination);
-        console.log(`Copied: ${cssDestination}`);
+        console.log(`✔ Copied: ${cssDestination}`);
     } catch (err) {
-        console.error("Error copying static assets:", err);
+        console.error("✖ Error copying static assets:", err.message);
     }
 }
 
 async function generateSite() {
     try {
+        console.log("🔄 Generating site...");
         const files = await fs.readdir(INPUT_DIR);
 
         await fs.mkdir(OUTPUT_DIR, { recursive: true });
@@ -35,14 +37,53 @@ async function generateSite() {
 
                 const outputFilePath = join(OUTPUT_DIR, file.replace(".norg", ".html"));
                 await fs.writeFile(outputFilePath, rendered, "utf-8");
-                console.log(`Generated: ${outputFilePath}`);
+                console.log(`✔ Generated: ${outputFilePath}`);
             }
         }
 
         await copyStaticAssets();
+        console.log("🎉 Site generation complete!");
     } catch (err) {
-        console.error("Error generating site:", err);
+        console.error("✖ Error generating site:", err.message);
     }
 }
 
-generateSite().catch((err) => console.error("Error generating site:", err));
+async function cleanOutputDir() {
+    try {
+        console.log("🧹 Cleaning output directory...");
+        await fs.rm(OUTPUT_DIR, { recursive: true, force: true });
+        console.log("✔ Output directory cleaned.");
+    } catch (err) {
+        console.error("✖ Error cleaning output directory:", err.message);
+    }
+}
+
+function showHelp() {
+    console.log(`
+Usage: norgkyll <command>
+
+Commands:
+  build       Generate the static site.
+  clean       Remove the output directory.
+  help        Show this help message.
+`);
+}
+
+async function main() {
+    const command = process.argv[2];
+
+    switch (command) {
+        case "build":
+            await generateSite();
+            break;
+        case "clean":
+            await cleanOutputDir();
+            break;
+        case "help":
+        default:
+            showHelp();
+            break;
+    }
+}
+
+main().catch((err) => console.error("✖ Unexpected error:", err.message));
