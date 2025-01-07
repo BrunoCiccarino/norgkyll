@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://marketplace.visualstudio.com/items?itemName=BrunoCiccarino.nekonight">
+  <a href="https://github.com/nvim-neorg/neorg">
     <img src="./img/norgkyll.png" width="600" height="400">
   </a>
   <br>
