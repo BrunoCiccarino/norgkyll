@@ -1,3 +1,5 @@
+import hljs from "highlight.js";
+
 type TaskState = "( )" | "(x)" | "(-)" | "(=)" | "(_)" | "(!)" | "(?)" | "(+)";
 type InlineMarkup = "*" | "/" | "_" | "^" | ",";
 
@@ -44,27 +46,29 @@ export function parseNorgToHtml(norgContent: string): string {
             }
             continue;
         }
-    
-        if (line.startsWith("@code")) {
-            const [, language] = line.match(/^@code\s+(\w+)/) || [];
+        
+        if (line.trim().startsWith("@code")) {
+            const [, language] = line.trim().match(/^@code\s+(\w+)/) || [];
             inCodeBlock = true;
             codeBlockLanguage = language || "plaintext";
+            codeBlockContent = ""; 
+            continue;
+        }
+        
+        if (line.trim().startsWith("@end") && inCodeBlock) {
+            const highlightedCode = hljs.highlight(codeBlockLanguage, codeBlockContent.trim(), true).value;
+            html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
+            inCodeBlock = false;
+            codeBlockLanguage = "";
             codeBlockContent = "";
             continue;
         }
-    
+        
         if (inCodeBlock) {
-            if (line.startsWith("@end")) {
-                html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${escapeHtml(codeBlockContent)}</code></pre>\n`;
-                inCodeBlock = false;
-                codeBlockLanguage = "";
-                codeBlockContent = "";
-            } else {
-                codeBlockContent += (codeBlockContent ? "\n" : "") + line;
-            }
+            codeBlockContent += (codeBlockContent ? "\n" : "") + line; 
             continue;
         }
-    
+        
         const taskMatch = line.trim().match(/^-\s\(([\sx\-=!+?_])\)\s(.+)/);
         if (taskMatch) {
             const [, state, taskText] = taskMatch;

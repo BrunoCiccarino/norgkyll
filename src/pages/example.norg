@@ -21,6 +21,11 @@
 ** Content
    Here is the main content of the page. You can use different levels of headings and formatting to organize your ideas.
 
+** Code block
+   @code lua 
+      print("Hello world!")
+   @end 
+
 *** Subsection 1: Key Points
     - This subsection highlights key points.
     - Use bullet points or paragraphs to explain ideas.
