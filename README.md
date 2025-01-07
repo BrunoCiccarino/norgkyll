@@ -8,6 +8,7 @@
   <br>
 </h1>
 
+
 Welcome aboard! NorgKyll is your go-to tool for converting Neorg files (`.norg`) into beautiful, fully-functional static websites. Whether you're a Markdown veteran or new to structured text, NorgKyll bridges the gap between simplicity and power.  
 
 ---
@@ -72,6 +73,7 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 
 - [ ] Add support for tables
 - [ ] Add a prompt in the cli asking for the website name
+- [ ] Start creating documentation
 - [ ] Add markdown support
 
 ### Why NorgKyll? 🚀  
@@ -96,5 +98,7 @@ Transform your notes into something spectacular with NorgKyll. Whether it’s pr
 ## ☕ Sponsor this project
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/ciccabr9p)
+[!["ko-fi"](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/brunociccarinoo)
+[!["github-sponsors"](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white)](https://github.com/sponsors/BrunoCiccarino/)
 
 <p align="center">Copyright © 2025 Bruno Ciccarino</p>
