@@ -85,6 +85,7 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 - [ ] Add support for tables
 - [ ] Add a prompt in the cli asking for the website name
 - [ ] Start creating documentation
+- [ ] Add support for neorg image
 - [ ] Add markdown support
 - [ ] Add mdx support 
 - [ ] Add org-mode support 
