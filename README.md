@@ -8,13 +8,13 @@
   <br>
 </h1>
 
-<p align="center">
+<div align="center">
 
 [![stars](https://img.shields.io/github/stars/BrunoCiccarino/norgkyll?style=for-the-badge&color=%23dc8a78)](https://github.com/BrunoCiccarino/norgkyll)
 [![fork](https://img.shields.io/github/forks/BrunoCiccarino/norgkyll?style=for-the-badge&color=%23179299)](https://github.com/BrunoCiccarino/norgkyll)
 [![pull requests](https://img.shields.io/badge/pull_requests-welcome-gray?style=for-the-badge&color=%2340a02b)](https://github.com/BrunoCiccarino/norgkyll)
 
-</p>
+</div>
 
 Welcome aboard! NorgKyll is your go-to tool for converting Neorg files (`.norg`) into beautiful, fully-functional static websites. Whether you're a Markdown veteran or new to structured text, NorgKyll bridges the gap between simplicity and power.  
 
