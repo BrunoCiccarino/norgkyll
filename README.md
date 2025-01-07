@@ -4,7 +4,7 @@
     <img src="./img/norgkyll.png" width="600" height="400">
   </a>
   <br>
-  Nekonight
+  NorgKyll
   <br>
 </h1>
 
