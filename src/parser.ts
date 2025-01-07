@@ -8,18 +8,39 @@ export function parseNorgToHtml(norgContent: string): string {
     let inCodeBlock = false;
     let codeBlockLanguage = "";
     let codeBlockContent = "";
+    let inMetadataBlock = false;
+    let metadataContent = "";
 
     let html = "";
-    const stack: string[] = []; 
+    const stack: string[] = [];
 
     for (const line of lines) {
+        if (line.trim().startsWith("@document.meta")) {
+            inMetadataBlock = true;
+            metadataContent = "";
+            continue;
+        }
+
+        if (line.trim().startsWith("@end") && inMetadataBlock) {
+            const metadataHtml = processMetadata(metadataContent);
+            html += metadataHtml;
+            inMetadataBlock = false;
+            metadataContent = "";
+            continue;
+        }
+
+        if (inMetadataBlock) {
+            metadataContent += (metadataContent ? "\n" : "") + line.trim();
+            continue;
+        }
+
         if (line.startsWith("*")) {
             const level = line.match(/^\*+/)?.[0]?.length || 1;
             const headingText = line.substring(level).trim();
             html += `<h${level}>${escapeHtml(headingText)}</h${level}>\n`;
             continue;
         }
-    
+
         if (line.trim().startsWith("- ")) {
             if (!stack.includes("ul")) {
                 stack.push("ul");
@@ -28,7 +49,7 @@ export function parseNorgToHtml(norgContent: string): string {
             html += `<li>${escapeHtml(line.trim().substring(2))}</li>\n`;
             continue;
         }
-    
+
         if (line.trim().startsWith("~ ")) {
             if (!stack.includes("ol")) {
                 stack.push("ol");
@@ -37,7 +58,6 @@ export function parseNorgToHtml(norgContent: string): string {
             html += `<li>${escapeHtml(line.trim().substring(2))}</li>\n`;
             continue;
         }
-    
 
         if (line.trim() === "" && stack.length > 0) {
             while (stack.length > 0) {
@@ -46,17 +66,20 @@ export function parseNorgToHtml(norgContent: string): string {
             }
             continue;
         }
-        
+
         if (line.trim().startsWith("@code")) {
             const [, language] = line.trim().match(/^@code\s+(\w+)/) || [];
             inCodeBlock = true;
             codeBlockLanguage = language || "plaintext";
-            codeBlockContent = ""; 
+            codeBlockContent = "";
             continue;
         }
-        
+
         if (line.trim().startsWith("@end") && inCodeBlock) {
-            const highlightedCode = hljs.highlight(codeBlockLanguage, codeBlockContent.trim(), true).value;
+            const highlightedCode = hljs.highlight(codeBlockContent.trim(), {
+                language: codeBlockLanguage,
+                ignoreIllegals: true,
+            }).value;
             html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
             inCodeBlock = false;
             codeBlockLanguage = "";
@@ -65,10 +88,10 @@ export function parseNorgToHtml(norgContent: string): string {
         }
         
         if (inCodeBlock) {
-            codeBlockContent += (codeBlockContent ? "\n" : "") + line; 
+            codeBlockContent += (codeBlockContent ? "\n" : "") + line;
             continue;
         }
-        
+
         const taskMatch = line.trim().match(/^-\s\(([\sx\-=!+?_])\)\s(.+)/);
         if (taskMatch) {
             const [, state, taskText] = taskMatch;
@@ -76,13 +99,13 @@ export function parseNorgToHtml(norgContent: string): string {
             html += `<div class="task ${stateClass}">${escapeHtml(taskText)}</div>\n`;
             continue;
         }
-    
+
         const inlineMarkup = processInlineMarkup(line);
         if (inlineMarkup !== line) {
             html += `<p>${inlineMarkup}</p>\n`;
             continue;
         }
-    
+
         if (line.trim() !== "") {
             html += `<p>${escapeHtml(line.trim())}</p>\n`;
         }
@@ -93,6 +116,21 @@ export function parseNorgToHtml(norgContent: string): string {
         html += `</${tag}>\n`;
     }
 
+    return html;
+}
+
+function processMetadata(metadataContent: string): string {
+    const lines = metadataContent.split("\n");
+    let html = '<div class="metadata">\n';
+
+    for (const line of lines) {
+        const [key, value] = line.split(":").map(part => part.trim());
+        if (key && value) {
+            html += `<meta name="${escapeHtml(key.toLowerCase())}" content="${escapeHtml(value)}">\n`;
+        }
+    }
+
+    html += "</div>\n";
     return html;
 }
 
@@ -126,4 +164,3 @@ function getTaskStateClass(state: TaskState): string {
         default: return "todo-unknown";
     }
 }
-

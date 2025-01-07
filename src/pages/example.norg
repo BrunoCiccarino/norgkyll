@@ -41,7 +41,9 @@
    Wrap up the page with a summary or closing remarks. Encourage readers to take action, reflect, or explore further.
 
 ** Metadata
+   @document.meta 
    This section contains metadata or properties for the page:
    - Author: Your Name
    - Date: YYYY-MM-DD
    - Tags: template, norg, example
+   @end 
