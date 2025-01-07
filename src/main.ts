@@ -8,13 +8,18 @@ const OUTPUT_DIR = join(__dirname, "../dist");
 const STATIC_DIR = join(__dirname, "../static");
 
 async function copyStaticAssets() {
-    const cssSource = join(STATIC_DIR, "style.css");
-    const cssDestination = join(OUTPUT_DIR, "style.css");
+    const assets = [
+        { source: join(STATIC_DIR, "style.css"), destination: join(OUTPUT_DIR, "style.css") },
+        { source: join(STATIC_DIR, "highlight.css"), destination: join(OUTPUT_DIR, "highlight.css") },
+    ];
 
     try {
         await fs.mkdir(OUTPUT_DIR, { recursive: true });
-        await fs.copyFile(cssSource, cssDestination);
-        console.log(`✔ Copied: ${cssDestination}`);
+
+        for (const asset of assets) {
+            await fs.copyFile(asset.source, asset.destination);
+            console.log(`✔ Copied: ${asset.destination}`);
+        }
     } catch (err) {
         console.error("✖ Error copying static assets:", err.message);
     }
