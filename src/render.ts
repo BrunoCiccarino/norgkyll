@@ -1,4 +1,4 @@
-import { parseNorgToHtml } from "./parser";
+import { parseNorgToHtml } from "./parsers/parserNorg";
 
 const TEMPLATE = `
 <!DOCTYPE html>
