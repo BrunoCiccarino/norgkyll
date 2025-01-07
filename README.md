@@ -84,5 +84,11 @@ Transform your notes into something spectacular with NorgKyll. Whether it’s pr
 
 - [neorg](https://github.com/nvim-neorg/neorg)
 - [norgolith](https://github.com/NTBBloodbath/norgolith)
+- [jekyll](https://github.com/jekyll/jekyll)
+- [astro-js](https://github.com/withastro/astro)
+
+## ☕ Sponsor this project
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/ciccabr9p)
 
 <p align="center">Copyright © 2025 Bruno Ciccarino</p>
