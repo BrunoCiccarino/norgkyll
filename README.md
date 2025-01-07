@@ -80,4 +80,9 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 
 Transform your notes into something spectacular with NorgKyll. Whether it’s project documentation, a personal blog, or keeping track of tasks, your ideas deserve to shine! 🌟  
 
+### 👏 Acknowledgements
+
+- [neorg](https://github.com/nvim-neorg/neorg)
+- [norgolith](https://github.com/NTBBloodbath/norgolith)
+
 <p align="center">Copyright © 2025 Bruno Ciccarino</p>

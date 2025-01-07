@@ -24,6 +24,7 @@
   "homepage": "https://github.com/BrunoCiccarino/norgkyll#readme",
   "dependencies": {
     "fs": "^0.0.1-security",
+    "highlight.js": "^11.11.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
