@@ -68,6 +68,12 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 
 ---
 
+### 📋 Tasks
+
+- [ ] Add support for tables
+- [ ] Add a prompt in the cli asking for the website name
+- [ ] Add markdown support
+
 ### Why NorgKyll? 🚀  
 
 - **Effortless Conversion**: Turn `.norg` into HTML without breaking a sweat.  
