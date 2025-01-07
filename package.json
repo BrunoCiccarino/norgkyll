@@ -1,0 +1,32 @@
+{
+  "name": "norgkyll",
+  "version": "0.0.1",
+  "description": "easily generate static sites while being compatible with your norg notes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrunoCiccarino/norgkyll.git"
+  },
+  "keywords": [
+    "norg",
+    "neorg",
+    "neovim",
+    "jekyll"
+  ],
+  "author": "Bruno Ciccarino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BrunoCiccarino/norgkyll/issues"
+  },
+  "homepage": "https://github.com/BrunoCiccarino/norgkyll#readme",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5"
+  }
+}

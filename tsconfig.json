@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "types": ["node"],
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "target": "es2020"
+  }
+}
+
