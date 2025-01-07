@@ -14,7 +14,7 @@ Welcome aboard! NorgKyll is your go-to tool for converting Neorg files (`.norg`)
 
 ## What is Neorg? 🤔  
 
-Think of Neorg as a supercharged Markdown. It’s a markup format designed for note-taking, life management, and pretty much anything else you can express in plaintext. Neorg works seamlessly with Neovim, making it a breeze to create, edit, and organize your notes.  
+Think of [Neorg](https://github.com/nvim-neorg/neorg) as a supercharged Markdown. It’s a markup format designed for note-taking, life management, and pretty much anything else you can express in plaintext. Neorg works seamlessly with Neovim, making it a breeze to create, edit, and organize your notes.  
 
 ---
 
