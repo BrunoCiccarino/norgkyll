@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "types": ["node"],
-    "esModuleInterop": true,
+    "outDir": "bin",
     "module": "commonjs",
-    "target": "es2020"
-  }
+    "target": "es6",
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist/**/*", "node_modules"]
 }

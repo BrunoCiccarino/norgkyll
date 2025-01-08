@@ -9,57 +9,6 @@ const TEMPLATE = `
     <title>{{title}}</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="highlight.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            color: #2c3e50;
-        }
-        ul, ol {
-            padding-left: 20px;
-        }
-        pre {
-            background-color: #2e2e2e;
-            color: #f5f5f5;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: monospace;
-        }
-        code {
-            font-family: monospace;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-        .task {
-            margin: 5px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-        .todo-undone {
-            background-color: #f9f9f9;
-        }
-        .todo-done {
-            background-color: #d4edda;
-            text-decoration: line-through;
-        }
-        .todo-urgent {
-            background-color: #f8d7da;
-            font-weight: bold;
-        }
-        footer {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #555;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
     <header>
