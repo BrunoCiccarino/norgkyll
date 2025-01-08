@@ -31,14 +31,14 @@ code {
     border-radius: 3px;
 }
 .todo-undone {
-    background-color: #f9f9f9;
+    background-color: #e78284;
 }
 .todo-done {
-    background-color: #d4edda;
+    background-color: #a6d189;
     text-decoration: line-through;
 }
 .todo-urgent {
-    background-color: #f8d7da;
+    background-color: #ca9ee6;
     font-weight: bold;
 }
 footer {
