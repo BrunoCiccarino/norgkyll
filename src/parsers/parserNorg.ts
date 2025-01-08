@@ -176,14 +176,18 @@ function processLinks(text: string): string {
             break;
         }
 
-        const hrefEnd = text.indexOf("}!", linkEnd + 2);
+        const hrefEnd = text.indexOf("}", linkEnd + 2);
         if (hrefEnd === -1) {
             result += text.slice(i);
             break;
         }
 
         const linkText = text.slice(linkStart + 1, linkEnd);
-        const href = text.slice(linkEnd + 2, hrefEnd);
+        let href = text.slice(linkEnd + 2, hrefEnd);
+
+        if (href.endsWith("!")) {
+            href = href.slice(0, -1); 
+        }
 
         result += text.slice(i, linkStart);
         result += `<a href="${escapeHtml(href)}">${escapeHtml(linkText)}</a>`;
