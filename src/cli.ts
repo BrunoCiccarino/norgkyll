@@ -7,11 +7,11 @@ import { execSync } from "child_process";
 import inquirer from "inquirer";
 import os from "os";
 
-const PATH_DIR = join(__dirname, "../src/pages");
-const OUTPUT_DIR = join(__dirname, "../dist");
+// Default directories
+let PATH_DIR: string;
 const STATIC_DIR = join(__dirname, "../static");
 
-async function copyTemplatesAndStatic(destination: string) {
+async function copyTemplatesAndStatic(destination: string): Promise<void> {
     const TEMPLATES_DIR = join(__dirname, "../src/pages");
 
     try {
@@ -96,18 +96,22 @@ async function copyStaticAssets(outputDir: string): Promise<void> {
             await fs.copyFile(asset.source, asset.destination);
             console.log(`✔ Copied: ${asset.destination}`);
         }
-    } catch (err: any) {
-        console.error("✖ Error copying static assets:", err.message);
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error("✖ Error copying static assets:", err.message);
+        }
     }
 }
 
 async function generateSite(destination: string = process.cwd()): Promise<void> {
     try {
+        const pagesDir = join(destination, "src/pages");
+        PATH_DIR = pagesDir;
+
         console.log("🔄 Generating site...");
         const files = await fs.readdir(PATH_DIR);
 
         const outputDir = join(destination, "dist");
-
         await fs.mkdir(outputDir, { recursive: true });
 
         for (const file of files) {
@@ -127,22 +131,26 @@ async function generateSite(destination: string = process.cwd()): Promise<void> 
         await copyStaticAssets(outputDir);
 
         console.log("🎉 Site generation complete!");
-    } catch (err: any) {
-        console.error("✖ Error generating site:", err.message);
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error("✖ Error generating site:", err.message);
+        }
     }
 }
 
-async function cleanOutputDir() {
+async function cleanOutputDir(): Promise<void> {
     try {
         console.log("🧹 Cleaning output directory...");
-        await fs.rm(OUTPUT_DIR, { recursive: true, force: true });
+        await fs.rm(join(process.cwd(), "dist"), { recursive: true, force: true });
         console.log("✔ Output directory cleaned.");
-    } catch (err: any) {
-        console.error("✖ Error cleaning output directory:", err.message);
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error("✖ Error cleaning output directory:", err.message);
+        }
     }
 }
 
-async function createProjectStructure(projectName: string, projectPath: string) {
+async function createProjectStructure(projectName: string, projectPath: string): Promise<void> {
     try {
         await fs.mkdir(projectPath, { recursive: true });
         console.log(`✔ Created project directory at: ${projectPath}`);
@@ -155,12 +163,14 @@ async function createProjectStructure(projectName: string, projectPath: string) 
         };
         await fs.writeFile(packageJsonPath, JSON.stringify(packageJsonContent, null, 2), "utf-8");
         console.log("✔ Initialized package.json");
-    } catch (err: any) {
-        console.error("✖ Error creating project structure:", err.message);
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error("✖ Error creating project structure:", err.message);
+        }
     }
 }
 
-async function initProject() {
+async function initProject(): Promise<void> {
     const { projectName, gitInit, projectPath } = await promptUserForProjectDetails();
 
     await createProjectStructure(projectName, projectPath);
@@ -169,8 +179,10 @@ async function initProject() {
         try {
             execSync("git init", { cwd: projectPath, stdio: ["ignore", "ignore", "ignore"] });
             console.log("✔ Initialized empty Git repository.");
-        } catch (err: any) {
-            console.error("✖ Failed to initialize Git repository:", err.message);
+        } catch (err) {
+            if (err instanceof Error) {
+                console.error("✖ Failed to initialize Git repository:", err.message);
+            }
         }
     }
 
@@ -179,7 +191,7 @@ async function initProject() {
     console.log(`Project Path: ${projectPath}`);
 }
 
-function showHelp() {
+function showHelp(): void {
     console.log(`
 Usage: norgkyll <command>
 
@@ -191,7 +203,7 @@ Commands:
 `);
 }
 
-async function main() {
+async function main(): Promise<void> {
     const command = process.argv[2];
     const destination = process.argv[3] ? resolve(process.argv[3]) : process.cwd();
 
@@ -212,5 +224,10 @@ async function main() {
     }
 }
 
-
-main().catch((err) => console.error("✖ Unexpected error:", err.message));
+main().catch((err: unknown) => {
+    if (err instanceof Error) {
+        console.error("✖ Unexpected error:", err.message);
+    } else {
+        console.error("✖ Unknown error occurred.");
+    }
+});

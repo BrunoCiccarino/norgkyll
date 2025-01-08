@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/BrunoCiccarino/norgkyll#readme",
   "bin": {
-  "norgkyll": "./bin/cli.js"
+    "norgkyll": "./bin/cli.js"
   },
   "dependencies": {
     "fs": "^0.0.1-security",
