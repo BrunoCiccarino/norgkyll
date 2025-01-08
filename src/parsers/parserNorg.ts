@@ -77,7 +77,7 @@ export function parseNorgToHtml(norgContent: string): string {
             const language = parts.length > 1 ? parts[1] : "plaintext";
             const validLang = hljs.getLanguage(language) ? language : 'plaintext';
             codeBlockLanguage = validLang;
-            console.log(`Starting code block with language: ${language}`);
+            console.warn(`Starting code block with language: ${language}`);
 
             inCodeBlock = true;
             codeBlockLanguage = language;
@@ -86,7 +86,7 @@ export function parseNorgToHtml(norgContent: string): string {
         }
 
         if (line.trim() === "@end" && inCodeBlock) {
-            console.log(`Code block content before highlighting:\n${codeBlockContent}`);
+            console.warn(`Processing code block with language: ${codeBlockLanguage}`);
             const highlightedCode = hljs.highlight(codeBlockLanguage, codeBlockContent.trim(), true).value;
             html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
             inCodeBlock = false;
@@ -137,8 +137,7 @@ function processMetadata(metadataContent: string): string {
     for (const line of lines) {
         const colonIndex = line.indexOf(":");
         if (colonIndex !== -1) {
-            const key = line.slice(0, colonIndex).trim();
-            const value = line.slice(colonIndex + 1).trim();
+            const [key, value] = line.split(":", 2).map((part) => part.trim());
             html += `<meta name="${escapeHtml(key.toLowerCase())}" content="${escapeHtml(value)}">\n`;
         }
     }
