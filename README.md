@@ -13,6 +13,7 @@
 [![stars](https://img.shields.io/github/stars/BrunoCiccarino/norgkyll?style=for-the-badge&color=%23dc8a78)](https://github.com/BrunoCiccarino/norgkyll)
 [![fork](https://img.shields.io/github/forks/BrunoCiccarino/norgkyll?style=for-the-badge&color=%23179299)](https://github.com/BrunoCiccarino/norgkyll)
 [![pull requests](https://img.shields.io/badge/pull_requests-welcome-gray?style=for-the-badge&color=%2340a02b)](https://github.com/BrunoCiccarino/norgkyll)
+[![Discord](https://img.shields.io/badge/discord-join-7289da?style=for-the-badge&logo=discord)](https://discord.gg/T6EgTAX7ht)
 [![NPM Downloads](https://img.shields.io/npm/d18m/norgkyll?style=for-the-badge&logo=npm&color=%23ca9ee6)](https://www.npmjs.com/package/norgkyll)
 
 </div>
