@@ -57,9 +57,21 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 
 #### Commands  
 
+- **init**: initializes a project with .norg templates and css
+
+![image](./img/norginit.jpg)
+
 - **build**: Generate the static site based on your `.norg` files.  
+
+![image](./img/norgbuild.jpg)
+
 - **clean**: Remove the output directory and start fresh.  
+
+![image](./img/norgclean.jpg)
+
 - **help**: Show help and usage instructions.  
+
+![image](./img/norghelp.jpg)
 
 ---
 
