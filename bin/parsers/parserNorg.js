@@ -53,7 +53,7 @@ function parseNorgToHtml(norgContent) {
                 stack.push("ol");
                 html += "<ol>\n";
             }
-            html += `<li>${escapeHtml(line.trim().slice(2))}</li>\n`;
+            html += `<li>${escapeHtml(line.slice(2).trim())}</li>\n`;
             continue;
         }
         if (line.trim() === "" && stack.length > 0) {
@@ -63,22 +63,27 @@ function parseNorgToHtml(norgContent) {
             }
             continue;
         }
-        console.log(`Processing line: "${line}"`);
         if (line.trim().startsWith("@code")) {
             const parts = line.trim().split(" ");
             const language = parts.length > 1 ? parts[1] : "plaintext";
             const validLang = highlight_js_1.default.getLanguage(language) ? language : 'plaintext';
             codeBlockLanguage = validLang;
-            console.log(`Starting code block with language: ${language}`);
             inCodeBlock = true;
-            codeBlockLanguage = language;
             codeBlockContent = "";
             continue;
         }
         if (line.trim() === "@end" && inCodeBlock) {
-            console.log(`Code block content before highlighting:\n${codeBlockContent}`);
-            const highlightedCode = highlight_js_1.default.highlight(codeBlockLanguage, codeBlockContent.trim(), true).value;
-            html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
+            try {
+                const highlightedCode = highlight_js_1.default.highlight(codeBlockContent.trim(), {
+                    language: codeBlockLanguage,
+                    ignoreIllegals: true,
+                }).value;
+                html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
+            }
+            catch (error) {
+                console.error(`Error highlighting code block with language "${codeBlockLanguage}":`, error);
+                html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${escapeHtml(codeBlockContent.trim())}</code></pre>\n`;
+            }
             inCodeBlock = false;
             codeBlockLanguage = "";
             codeBlockContent = "";
@@ -93,7 +98,7 @@ function parseNorgToHtml(norgContent) {
             if (taskStateEnd !== -1) {
                 const state = line.slice(2, taskStateEnd + 1);
                 if (!isValidTaskState(state)) {
-                    console.warn(`Invalid task state: ${state}`);
+                    //    console.warn(`Invalid task state: ${state}`);
                     continue;
                 }
                 const taskText = line.slice(taskStateEnd + 2).trim();
@@ -120,8 +125,7 @@ function processMetadata(metadataContent) {
     for (const line of lines) {
         const colonIndex = line.indexOf(":");
         if (colonIndex !== -1) {
-            const key = line.slice(0, colonIndex).trim();
-            const value = line.slice(colonIndex + 1).trim();
+            const [key, value] = line.split(":", 2).map((part) => part.trim());
             html += `<meta name="${escapeHtml(key.toLowerCase())}" content="${escapeHtml(value)}">\n`;
         }
     }

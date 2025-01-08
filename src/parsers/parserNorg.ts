@@ -59,7 +59,7 @@ export function parseNorgToHtml(norgContent: string): string {
                 stack.push("ol");
                 html += "<ol>\n";
             }
-            html += `<li>${escapeHtml(line.trim().slice(2))}</li>\n`;
+            html += `<li>${escapeHtml(line.slice(2).trim())}</li>\n`;
             continue;
         }
 
@@ -71,41 +71,46 @@ export function parseNorgToHtml(norgContent: string): string {
             continue;
         }
 
-        console.log(`Processing line: "${line}"`);
         if (line.trim().startsWith("@code")) {
             const parts = line.trim().split(" ");
             const language = parts.length > 1 ? parts[1] : "plaintext";
             const validLang = hljs.getLanguage(language) ? language : 'plaintext';
             codeBlockLanguage = validLang;
-            console.warn(`Starting code block with language: ${language}`);
-
+        
             inCodeBlock = true;
-            codeBlockLanguage = language;
             codeBlockContent = "";
             continue;
         }
-
+        
         if (line.trim() === "@end" && inCodeBlock) {
-            console.warn(`Processing code block with language: ${codeBlockLanguage}`);
-            const highlightedCode = hljs.highlight(codeBlockLanguage, codeBlockContent.trim(), true).value;
-            html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
+            try {
+                const highlightedCode = hljs.highlight(codeBlockContent.trim(), {
+                    language: codeBlockLanguage,
+                    ignoreIllegals: true,
+                }).value;
+        
+                html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${highlightedCode}</code></pre>\n`;
+            } catch (error) {
+                console.error(`Error highlighting code block with language "${codeBlockLanguage}":`, error);
+                html += `<pre><code class="language-${escapeHtml(codeBlockLanguage)}">${escapeHtml(codeBlockContent.trim())}</code></pre>\n`;
+            }
             inCodeBlock = false;
             codeBlockLanguage = "";
             codeBlockContent = "";
             continue;
         }
-
+        
         if (inCodeBlock) {
             codeBlockContent += `${line}\n`;
             continue;
         }
-
+        
         if (line.trim().startsWith("- (")) {
             const taskStateEnd = line.indexOf(")");
             if (taskStateEnd !== -1) {
                 const state = line.slice(2, taskStateEnd + 1) as TaskState;
                if (!isValidTaskState(state)) {
-                   console.warn(`Invalid task state: ${state}`);
+                //    console.warn(`Invalid task state: ${state}`);
                    continue;
                }
                 const taskText = line.slice(taskStateEnd + 2).trim();

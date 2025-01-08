@@ -19,8 +19,8 @@ const render_1 = require("./render");
 const child_process_1 = require("child_process");
 const inquirer_1 = __importDefault(require("inquirer"));
 const os_1 = __importDefault(require("os"));
-const PATH_DIR = (0, path_1.join)(__dirname, "../src/pages");
-const OUTPUT_DIR = (0, path_1.join)(__dirname, "../dist");
+// Default directories
+let PATH_DIR;
 const STATIC_DIR = (0, path_1.join)(__dirname, "../static");
 function copyTemplatesAndStatic(destination) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -105,13 +105,17 @@ function copyStaticAssets(outputDir) {
             }
         }
         catch (err) {
-            console.error("✖ Error copying static assets:", err.message);
+            if (err instanceof Error) {
+                console.error("✖ Error copying static assets:", err.message);
+            }
         }
     });
 }
 function generateSite() {
     return __awaiter(this, arguments, void 0, function* (destination = process.cwd()) {
         try {
+            const pagesDir = (0, path_1.join)(destination, "src/pages");
+            PATH_DIR = pagesDir;
             console.log("🔄 Generating site...");
             const files = yield fs_1.promises.readdir(PATH_DIR);
             const outputDir = (0, path_1.join)(destination, "dist");
@@ -131,7 +135,9 @@ function generateSite() {
             console.log("🎉 Site generation complete!");
         }
         catch (err) {
-            console.error("✖ Error generating site:", err.message);
+            if (err instanceof Error) {
+                console.error("✖ Error generating site:", err.message);
+            }
         }
     });
 }
@@ -139,11 +145,13 @@ function cleanOutputDir() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log("🧹 Cleaning output directory...");
-            yield fs_1.promises.rm(OUTPUT_DIR, { recursive: true, force: true });
+            yield fs_1.promises.rm((0, path_1.join)(process.cwd(), "dist"), { recursive: true, force: true });
             console.log("✔ Output directory cleaned.");
         }
         catch (err) {
-            console.error("✖ Error cleaning output directory:", err.message);
+            if (err instanceof Error) {
+                console.error("✖ Error cleaning output directory:", err.message);
+            }
         }
     });
 }
@@ -163,7 +171,9 @@ function createProjectStructure(projectName, projectPath) {
             console.log("✔ Initialized package.json");
         }
         catch (err) {
-            console.error("✖ Error creating project structure:", err.message);
+            if (err instanceof Error) {
+                console.error("✖ Error creating project structure:", err.message);
+            }
         }
     });
 }
@@ -177,7 +187,9 @@ function initProject() {
                 console.log("✔ Initialized empty Git repository.");
             }
             catch (err) {
-                console.error("✖ Failed to initialize Git repository:", err.message);
+                if (err instanceof Error) {
+                    console.error("✖ Failed to initialize Git repository:", err.message);
+                }
             }
         }
         console.log("\n🎉 Project setup complete!");
@@ -217,4 +229,11 @@ function main() {
         }
     });
 }
-main().catch((err) => console.error("✖ Unexpected error:", err.message));
+main().catch((err) => {
+    if (err instanceof Error) {
+        console.error("✖ Unexpected error:", err.message);
+    }
+    else {
+        console.error("✖ Unknown error occurred.");
+    }
+});
