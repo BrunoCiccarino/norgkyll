@@ -3,6 +3,10 @@ import hljs from "highlight.js";
 type TaskState = "( )" | "(x)" | "(-)" | "(=)" | "(_)" | "(!)" | "(?)" | "(+)";
 type InlineMarkup = "*" | "/" | "_" | "^" | ",";
 
+function isValidTaskState(state: TaskState) {
+    return ["( )", "(x)", "(-)", "(=)", "(_)", "(!)", "(?)", "(+)"].includes(state);
+}
+
 export function parseNorgToHtml(norgContent: string): string {
     const lines = norgContent.split("\n");
     let inCodeBlock = false;
@@ -98,13 +102,13 @@ export function parseNorgToHtml(norgContent: string): string {
             const taskStateEnd = line.indexOf(")");
             if (taskStateEnd !== -1) {
                 const state = line.slice(2, taskStateEnd + 1) as TaskState;
+               if (!isValidTaskState(state)) {
+                   console.warn(`Invalid task state: ${state}`);
+                   continue;
+               }
                 const taskText = line.slice(taskStateEnd + 2).trim();
-                const stateClass = getTaskStateClass(state);
-                html += `<div class="task ${stateClass}">${escapeHtml(taskText)}</div>\n`;
-                continue;
-            }
         }
-
+    }
         const inlineMarkup = processInlineMarkup(line);
         if (inlineMarkup !== line) {
             html += `<p>${inlineMarkup}</p>\n`;
@@ -122,10 +126,6 @@ export function parseNorgToHtml(norgContent: string): string {
     }
 
     return html;
-}
-
-function isValidTaskState(state: TaskState) {
-    return ["( )", "(x)", "(-)", "(=)", "(_)", "(!)", "(?)", "(+)"].includes(state);
 }
 
 function processMetadata(metadataContent: string): string {
@@ -164,6 +164,7 @@ function processInlineMarkup(text: string): string {
 }
 
 function replaceMarkup(text: string, symbol: string, tag: string): string {
+ 
     while (true) {
         const start = text.indexOf(symbol);
         if (start === -1) break;
