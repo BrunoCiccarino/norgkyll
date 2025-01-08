@@ -7,7 +7,7 @@ import { execSync } from "child_process";
 import inquirer from "inquirer";
 import os from "os";
 
-const INPUT_DIR = join(__dirname, "../src/pages");
+const PATH_DIR = join(__dirname, "../src/pages");
 const OUTPUT_DIR = join(__dirname, "../dist");
 const STATIC_DIR = join(__dirname, "../static");
 
@@ -104,7 +104,7 @@ async function copyStaticAssets(outputDir: string): Promise<void> {
 async function generateSite(destination: string = process.cwd()): Promise<void> {
     try {
         console.log("🔄 Generating site...");
-        const files = await fs.readdir(INPUT_DIR);
+        const files = await fs.readdir(PATH_DIR);
 
         const outputDir = join(destination, "dist");
 
@@ -112,7 +112,7 @@ async function generateSite(destination: string = process.cwd()): Promise<void> 
 
         for (const file of files) {
             if (file.endsWith(".norg")) {
-                const filePath = join(INPUT_DIR, file);
+                const filePath = join(PATH_DIR, file);
                 const content = await fs.readFile(filePath, "utf-8");
 
                 const title = file.replace(".norg", "");
