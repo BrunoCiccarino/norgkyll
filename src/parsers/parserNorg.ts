@@ -75,6 +75,8 @@ export function parseNorgToHtml(norgContent: string): string {
         if (line.trim().startsWith("@code")) {
             const parts = line.trim().split(" ");
             const language = parts.length > 1 ? parts[1] : "plaintext";
+            const validLang = hljs.getLanguage(language) ? language : 'plaintext';
+            codeBlockLanguage = validLang;
             console.log(`Starting code block with language: ${language}`);
 
             inCodeBlock = true;

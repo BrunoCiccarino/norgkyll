@@ -5,6 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseNorgToHtml = parseNorgToHtml;
 const highlight_js_1 = __importDefault(require("highlight.js"));
+function isValidTaskState(state) {
+    return ["( )", "(x)", "(-)", "(=)", "(_)", "(!)", "(?)", "(+)"].includes(state);
+}
 function parseNorgToHtml(norgContent) {
     const lines = norgContent.split("\n");
     let inCodeBlock = false;
@@ -64,6 +67,8 @@ function parseNorgToHtml(norgContent) {
         if (line.trim().startsWith("@code")) {
             const parts = line.trim().split(" ");
             const language = parts.length > 1 ? parts[1] : "plaintext";
+            const validLang = highlight_js_1.default.getLanguage(language) ? language : 'plaintext';
+            codeBlockLanguage = validLang;
             console.log(`Starting code block with language: ${language}`);
             inCodeBlock = true;
             codeBlockLanguage = language;
@@ -87,10 +92,11 @@ function parseNorgToHtml(norgContent) {
             const taskStateEnd = line.indexOf(")");
             if (taskStateEnd !== -1) {
                 const state = line.slice(2, taskStateEnd + 1);
+                if (!isValidTaskState(state)) {
+                    console.warn(`Invalid task state: ${state}`);
+                    continue;
+                }
                 const taskText = line.slice(taskStateEnd + 2).trim();
-                const stateClass = getTaskStateClass(state);
-                html += `<div class="task ${stateClass}">${escapeHtml(taskText)}</div>\n`;
-                continue;
             }
         }
         const inlineMarkup = processInlineMarkup(line);
