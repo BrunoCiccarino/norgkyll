@@ -124,6 +124,10 @@ export function parseNorgToHtml(norgContent: string): string {
     return html;
 }
 
+function isValidTaskState(state: TaskState) {
+    return ["( )", "(x)", "(-)", "(=)", "(_)", "(!)", "(?)", "(+)"].includes(state);
+}
+
 function processMetadata(metadataContent: string): string {
     const lines = metadataContent.split("\n");
     let html = '<div class="metadata">\n';
