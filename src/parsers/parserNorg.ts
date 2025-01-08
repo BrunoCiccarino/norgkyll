@@ -159,6 +159,40 @@ function escapeHtml(text: string): string {
         .split("'").join("&#039;");
 }
 
+function processLinks(text: string): string {
+    let result = "";
+    let i = 0;
+
+    while (i < text.length) {
+        const linkStart = text.indexOf("[", i);
+        if (linkStart === -1) {
+            result += text.slice(i);
+            break;
+        }
+
+        const linkEnd = text.indexOf("]{", linkStart);
+        if (linkEnd === -1) {
+            result += text.slice(i);
+            break;
+        }
+
+        const hrefEnd = text.indexOf("}!", linkEnd + 2);
+        if (hrefEnd === -1) {
+            result += text.slice(i);
+            break;
+        }
+
+        const linkText = text.slice(linkStart + 1, linkEnd);
+        const href = text.slice(linkEnd + 2, hrefEnd);
+
+        result += text.slice(i, linkStart);
+        result += `<a href="${escapeHtml(href)}">${escapeHtml(linkText)}</a>`;
+        i = hrefEnd + 1;
+    }
+
+    return result;
+}
+
 function processInlineMarkup(text: string): string {
     let result = text;
     result = replaceMarkup(result, "*", "strong");
@@ -166,6 +200,7 @@ function processInlineMarkup(text: string): string {
     result = replaceMarkup(result, "_", "u");
     result = replaceMarkup(result, "^", "sup");
     result = replaceMarkup(result, ",", "sub");
+    result = processLinks(result);
     return result;
 }
 
