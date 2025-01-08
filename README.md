@@ -106,6 +106,7 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 
 ### 📋 Tasks
 
+- [ ] Add link support 
 - [ ] Add support for tables
 - [x] Add a prompt in the cli asking for the website name 
 - [ ] Start creating documentation
