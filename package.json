@@ -1,6 +1,6 @@
 {
   "name": "norgkyll",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "description": "easily generate static sites while being compatible with your norg notes",
   "main": "index.js",
   "scripts": {
