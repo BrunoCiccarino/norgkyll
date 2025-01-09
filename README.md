@@ -110,6 +110,9 @@ While Neorg helps you create structured content, NorgKyll lets you share it by g
 - [x] Add link support 
 - [x] Add a prompt in the cli asking for the website name 
 - [x] Add support for tables
+- [ ] Add table of contents support
+- [ ] Improve task renderer
+- [ ] fix the bold text formatting that is showing the strong tag
 - [ ] Start creating documentation
 - [ ] Add support for neorg image
 - [ ] Add markdown support
