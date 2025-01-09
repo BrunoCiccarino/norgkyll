@@ -15,7 +15,7 @@
    - Detailed sections with content
    - Tasks and goals
    - Closing notes
-
+   - [link]{https://github.com/BrunoCiccarino/norgkyll}!
 ** Introduction
    This section introduces the main topic of the page. Feel free to expand on the purpose and goals.
 
@@ -30,9 +30,25 @@
    Here is the main content of the page. You can use different levels of headings and formatting to organize your ideas.
 
 ** Code block
-   @code lua 
-      print("Hello world!")
+   @code lua  
+      if i == 3 then
+         print("I == 3")
+      else 
+         print("I != 3")
+      end 
+
+      for i = 10, 19, 1 do
+         print(i)
    @end 
+
+** Table
+
+   @table
+      | Head a | Head b | Head c |
+      | -      | -      | -      |
+      | Cell 1 | Cell 2 | Cell 3 |
+      | Cell 4 | Cell 5 | Cell 6 |
+   @end
 
 *** Subsection 1: Key Points
     - This subsection highlights key points.

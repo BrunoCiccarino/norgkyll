@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseNorgToHtml = parseNorgToHtml;
 const highlight_js_1 = __importDefault(require("highlight.js"));
+let inTableBlock = false;
+let tableContent = "";
 function isValidTaskState(state) {
     return ["( )", "(x)", "(-)", "(=)", "(_)", "(!)", "(?)", "(+)"].includes(state);
 }
@@ -34,6 +36,21 @@ function parseNorgToHtml(norgContent) {
             metadataContent += (metadataContent ? "\n" : "") + line.trim();
             continue;
         }
+        if (line.trim().startsWith("@table")) {
+            inTableBlock = true;
+            tableContent = "";
+            continue;
+        }
+        if (line.trim() === "@end" && inTableBlock) {
+            html += processTable(tableContent);
+            inTableBlock = false;
+            tableContent = "";
+            continue;
+        }
+        if (inTableBlock) {
+            tableContent += (tableContent ? "\n" : "") + line;
+            continue;
+        }
         if (line.startsWith("*")) {
             const level = countLeadingChars(line, "*");
             const headingText = line.slice(level).trim();
@@ -45,7 +62,15 @@ function parseNorgToHtml(norgContent) {
                 stack.push("ul");
                 html += "<ul>\n";
             }
-            html += `<li>${escapeHtml(line.trim().slice(2))}</li>\n`;
+            const listItemContent = line.trim().slice(2);
+            if (/\[.*?\]\{.*?\}/.test(listItemContent)) {
+                // Processa links no conteúdo da lista
+                const processedContent = processLinks(listItemContent);
+                html += `<li>${processedContent}</li>\n`;
+            }
+            else {
+                html += `<li>${escapeHtml(listItemContent)}</li>\n`;
+            }
             continue;
         }
         if (line.trim().startsWith("~ ")) {
@@ -53,7 +78,14 @@ function parseNorgToHtml(norgContent) {
                 stack.push("ol");
                 html += "<ol>\n";
             }
-            html += `<li>${escapeHtml(line.slice(2).trim())}</li>\n`;
+            const listItemContent = line.slice(2).trim();
+            if (/\[.*?\]\{.*?\}/.test(listItemContent)) {
+                const processedContent = processLinks(listItemContent);
+                html += `<li>${processedContent}</li>\n`;
+            }
+            else {
+                html += `<li>${escapeHtml(listItemContent)}</li>\n`;
+            }
             continue;
         }
         if (line.trim() === "" && stack.length > 0) {
@@ -168,6 +200,33 @@ function processLinks(text) {
         i = hrefEnd + 1;
     }
     return result;
+}
+function processTable(content) {
+    const rows = content.trim().split("\n");
+    if (rows.length < 2)
+        return "";
+    const headers = rows[0].split("|").map((cell) => cell.trim()).filter(Boolean);
+    const separator = rows[1].split("|").map((cell) => cell.trim()).filter(Boolean);
+    if (headers.length !== separator.length || separator.some((cell) => cell !== "-")) {
+        return "";
+    }
+    let html = "<table>\n<thead>\n<tr>\n";
+    for (const header of headers) {
+        html += `<th>${escapeHtml(header)}</th>\n`;
+    }
+    html += "</tr>\n</thead>\n<tbody>\n";
+    for (let i = 2; i < rows.length; i++) {
+        const cells = rows[i].split("|").map((cell) => cell.trim()).filter(Boolean);
+        if (cells.length !== headers.length)
+            continue;
+        html += "<tr>\n";
+        for (const cell of cells) {
+            html += `<td>${escapeHtml(cell)}</td>\n`;
+        }
+        html += "</tr>\n";
+    }
+    html += "</tbody>\n</table>\n";
+    return html;
 }
 function processInlineMarkup(text) {
     let result = text;
