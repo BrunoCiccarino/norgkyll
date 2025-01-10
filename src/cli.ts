@@ -99,12 +99,11 @@ async function generateSite(): Promise<void> {
             return;
         }
 
+        const rootOutputDir = join(process.cwd(), "dist");
+        await fs.mkdir(rootOutputDir, { recursive: true });
+
         for (const dir of directoriesWithNorg) {
             console.log(`🔄 Generating site for directory: ${dir}`);
-            
-            const outputDir = join(dir, "dist"); 
-            await fs.mkdir(outputDir, { recursive: true });
-
             
             const files = (await fs.readdir(dir)).filter((file) => file.endsWith(".norg"));
 
@@ -115,14 +114,13 @@ async function generateSite(): Promise<void> {
                 const title = file.replace(".norg", ""); 
                 const rendered = renderPage(content, title);
 
-                const outputFilePath = join(outputDir, `${title}.html`);
+                const outputFilePath = join(rootOutputDir, `${title}.html`);
                 await fs.writeFile(outputFilePath, rendered, "utf-8");
                 console.log(`✔ Generated: ${outputFilePath}`);
             }
-
-            await copyStaticAssets(outputDir);
         }
 
+        await copyStaticAssets(rootOutputDir);
         console.log("🎉 Site generation complete for all directories!");
     } catch (err) {
         if (err instanceof Error) {
