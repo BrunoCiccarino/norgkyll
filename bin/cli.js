@@ -17,9 +17,9 @@ const fs_1 = require("fs");
 const path_1 = require("path");
 const render_1 = require("./render");
 const child_process_1 = require("child_process");
+const glob_1 = require("glob");
 const inquirer_1 = __importDefault(require("inquirer"));
 const os_1 = __importDefault(require("os"));
-// Default directories
 let PATH_DIR;
 const STATIC_DIR = (0, path_1.join)(__dirname, "../static");
 function copyTemplatesAndStatic(destination) {
@@ -92,6 +92,41 @@ function promptUserForProjectDetails() {
         };
     });
 }
+function generateSite() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log("🔍 Searching for directories with .norg files...");
+            const filePaths = yield (0, glob_1.glob)("**/*.norg", { cwd: process.cwd(), absolute: true });
+            const directoriesWithNorg = Array.from(new Set(filePaths.map((filePath) => (0, path_1.join)(filePath, ".."))));
+            if (directoriesWithNorg.length === 0) {
+                console.log("⚠ No directories with .norg files found.");
+                return;
+            }
+            for (const dir of directoriesWithNorg) {
+                console.log(`🔄 Generating site for directory: ${dir}`);
+                const outputDir = (0, path_1.join)(dir, "dist");
+                yield fs_1.promises.mkdir(outputDir, { recursive: true });
+                const files = (yield fs_1.promises.readdir(dir)).filter((file) => file.endsWith(".norg"));
+                for (const file of files) {
+                    const filePath = (0, path_1.join)(dir, file);
+                    const content = yield fs_1.promises.readFile(filePath, "utf-8");
+                    const title = file.replace(".norg", "");
+                    const rendered = (0, render_1.renderPage)(content, title);
+                    const outputFilePath = (0, path_1.join)(outputDir, `${title}.html`);
+                    yield fs_1.promises.writeFile(outputFilePath, rendered, "utf-8");
+                    console.log(`✔ Generated: ${outputFilePath}`);
+                }
+                yield copyStaticAssets(outputDir);
+            }
+            console.log("🎉 Site generation complete for all directories!");
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                console.error("✖ Error generating site:", err.message);
+            }
+        }
+    });
+}
 function copyStaticAssets(outputDir) {
     return __awaiter(this, void 0, void 0, function* () {
         const assets = [
@@ -107,36 +142,6 @@ function copyStaticAssets(outputDir) {
         catch (err) {
             if (err instanceof Error) {
                 console.error("✖ Error copying static assets:", err.message);
-            }
-        }
-    });
-}
-function generateSite() {
-    return __awaiter(this, arguments, void 0, function* (destination = process.cwd()) {
-        try {
-            const pagesDir = (0, path_1.join)(destination, "src/pages");
-            PATH_DIR = pagesDir;
-            console.log("🔄 Generating site...");
-            const files = yield fs_1.promises.readdir(PATH_DIR);
-            const outputDir = (0, path_1.join)(destination, "dist");
-            yield fs_1.promises.mkdir(outputDir, { recursive: true });
-            for (const file of files) {
-                if (file.endsWith(".norg")) {
-                    const filePath = (0, path_1.join)(PATH_DIR, file);
-                    const content = yield fs_1.promises.readFile(filePath, "utf-8");
-                    const title = file.replace(".norg", "");
-                    const rendered = (0, render_1.renderPage)(content, title);
-                    const outputFilePath = (0, path_1.join)(outputDir, file.replace(".norg", ".html"));
-                    yield fs_1.promises.writeFile(outputFilePath, rendered, "utf-8");
-                    console.log(`✔ Generated: ${outputFilePath}`);
-                }
-            }
-            yield copyStaticAssets(outputDir);
-            console.log("🎉 Site generation complete!");
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                console.error("✖ Error generating site:", err.message);
             }
         }
     });
@@ -214,7 +219,7 @@ function main() {
         const destination = process.argv[3] ? (0, path_1.resolve)(process.argv[3]) : process.cwd();
         switch (command) {
             case "build":
-                yield generateSite(destination);
+                yield generateSite();
                 break;
             case "clean":
                 yield cleanOutputDir();

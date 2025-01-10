@@ -4,10 +4,10 @@ import { promises as fs } from "fs";
 import { join, resolve } from "path";
 import { renderPage } from "./render";
 import { execSync } from "child_process";
+import { glob } from "glob";
 import inquirer from "inquirer";
 import os from "os";
 
-// Default directories
 let PATH_DIR: string;
 const STATIC_DIR = join(__dirname, "../static");
 
@@ -85,6 +85,52 @@ async function promptUserForProjectDetails(): Promise<{ projectName: string; git
     };
 }
 
+async function generateSite(): Promise<void> {
+    try {
+        console.log("🔍 Searching for directories with .norg files...");
+        
+        const filePaths = await glob("**/*.norg", { cwd: process.cwd(), absolute: true }) as string[];
+        const directoriesWithNorg = Array.from(new Set(
+            filePaths.map((filePath: string) => join(filePath, "..")) 
+        ));
+
+        if (directoriesWithNorg.length === 0) {
+            console.log("⚠ No directories with .norg files found.");
+            return;
+        }
+
+        for (const dir of directoriesWithNorg) {
+            console.log(`🔄 Generating site for directory: ${dir}`);
+            
+            const outputDir = join(dir, "dist"); 
+            await fs.mkdir(outputDir, { recursive: true });
+
+            
+            const files = (await fs.readdir(dir)).filter((file) => file.endsWith(".norg"));
+
+            for (const file of files) {
+                const filePath = join(dir, file);
+                const content = await fs.readFile(filePath, "utf-8");
+
+                const title = file.replace(".norg", ""); 
+                const rendered = renderPage(content, title);
+
+                const outputFilePath = join(outputDir, `${title}.html`);
+                await fs.writeFile(outputFilePath, rendered, "utf-8");
+                console.log(`✔ Generated: ${outputFilePath}`);
+            }
+
+            await copyStaticAssets(outputDir);
+        }
+
+        console.log("🎉 Site generation complete for all directories!");
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error("✖ Error generating site:", err.message);
+        }
+    }
+}
+
 async function copyStaticAssets(outputDir: string): Promise<void> {
     const assets = [
         { source: join(STATIC_DIR, "style.css"), destination: join(outputDir, "style.css") },
@@ -99,41 +145,6 @@ async function copyStaticAssets(outputDir: string): Promise<void> {
     } catch (err) {
         if (err instanceof Error) {
             console.error("✖ Error copying static assets:", err.message);
-        }
-    }
-}
-
-async function generateSite(destination: string = process.cwd()): Promise<void> {
-    try {
-        const pagesDir = join(destination, "src/pages");
-        PATH_DIR = pagesDir;
-
-        console.log("🔄 Generating site...");
-        const files = await fs.readdir(PATH_DIR);
-
-        const outputDir = join(destination, "dist");
-        await fs.mkdir(outputDir, { recursive: true });
-
-        for (const file of files) {
-            if (file.endsWith(".norg")) {
-                const filePath = join(PATH_DIR, file);
-                const content = await fs.readFile(filePath, "utf-8");
-
-                const title = file.replace(".norg", "");
-                const rendered = renderPage(content, title);
-
-                const outputFilePath = join(outputDir, file.replace(".norg", ".html"));
-                await fs.writeFile(outputFilePath, rendered, "utf-8");
-                console.log(`✔ Generated: ${outputFilePath}`);
-            }
-        }
-
-        await copyStaticAssets(outputDir);
-
-        console.log("🎉 Site generation complete!");
-    } catch (err) {
-        if (err instanceof Error) {
-            console.error("✖ Error generating site:", err.message);
         }
     }
 }
@@ -209,7 +220,7 @@ async function main(): Promise<void> {
 
     switch (command) {
         case "build":
-            await generateSite(destination);
+            await generateSite();            
             break;
         case "clean":
             await cleanOutputDir();
