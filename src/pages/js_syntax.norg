@@ -1,0 +1,135 @@
+* JavaScript Syntax
+
+  JavaScript is a browser-based programming language created for website styling. The original JavaScript was created in a week (10 days), so until recently it was considered a somewhat limited language. 
+  Nowadays, with various libraries and frameworks, JavaScript has improved, offering significant control over the DOM (Document Object Model), which is the data representation of the objects that make up the structure and content of a document on the web. It can be called an API for web documents, allowing programs to change the structure, style, and content of the document. The DOM represents the document as nodes and objects, allowing programming languages to interact with the page. 
+
+  It can be modified with a scripting language like JavaScript. For example:
+
+  @code javascript 
+    document.write("Hello <u>written with document.write</u>"); 
+  @end
+
+* Variables
+  To start with these notes, I think it’s fair to begin with the basic JavaScript syntax. Like variable declarations that can be represented with a keyword (`let`). The `let` defines a variable in the current scope. What does this mean? It means that it defines a variable that is only valid in the scope where it is created. In other words, if the variable is created outside code blocks, it is valid for the entire code. Otherwise, it is valid only within the block of code where it was created.
+  
+  @code javascript 
+    let message = "Hello world";
+    console.log(message);
+  @end 
+
+  Unlike constants, variables are mutable.
+  
+  @code javascript 
+    message = "Hi";
+    console.log(message);
+  @end 
+
+  Constants, on the other hand, are immutable but work the same way as `let` regarding scope. By convention, when declaring constants, it's important to name them using uppercase letters. This way, you can distinguish a variable from a constant in a large codebase.
+
+  @code javascript 
+    const ME = "message";
+    console.log(ME);
+  @end 
+
+* Functions
+  Let's start talking about functions. Functions are a way to encapsulate reusable code in a block, making it easier to invoke this reusable code and avoiding repetition. For example, a code to add two numbers, a simple and reusable code, can be encapsulated in a function:
+
+  @code javascript 
+    function add(a, b) {
+      return a + b;
+    }
+  @end 
+
+  To call it again for use, simply invoke it like this:
+
+  @code javascript 
+    let result = add(5, 3);
+  @end 
+
+  Arrow functions were introduced in JavaScript with ES6. They allow us to declare functions with a shorter syntax. For example:
+
+  @code javascript 
+    const subtract = (a, b) => a - b;  
+  @end 
+
+  An anonymous function is a function without a name. It is typically not accessible after its creation.
+
+  @code javascript 
+    let multiply = function (a, b) {
+      return a * b;
+    }
+    multiply(10, 10);
+  @end 
+
+  Notice that the anonymous function does not have a name between the `function` keyword and the parentheses `()`. Since we need to call the anonymous function at some point, we assign it to a variable, in this case, the `multiply` variable.
+
+* Arrays and Objects
+  Arrays in JavaScript are used to store multiple values in a single variable. If you have a list of items (such as a list of car names), storing the cars in individual variables might look like this:
+
+  @code javascript
+    var car1 = "Saab";
+    var car2 = "Volvo";
+    var car3 = "BMW";
+  @end 
+
+  However, what if you want to loop through the cars and find a specific one? And what if you didn’t have 3 cars but 300?
+
+  The solution is an Array!
+  An Array can store many values with a single name, and you can access the values by querying an index number. For example, to access a specific car from the `cars` array, you would use the index of the item, starting from 0:
+
+  @code javascript
+    var cars = [ 
+    "Saab",
+    "Volvo",
+    "BMW"
+  ];
+
+  console.log(cars[0]); // Outputs "Saab"
+  console.log(cars[1]); // Outputs "Volvo"
+  console.log(cars[2]); // Outputs "BMW"
+  @end 
+
+  Arrays in JavaScript are zero-indexed, meaning that the first item in the array has an index of 0.
+
+  You can also loop through an array using a `for` loop to access each item, like this:
+
+  @code javascript
+    for (let i = 0; i < cars.length; i++) {
+      console.log(cars[i]);
+    }
+  @end
+
+  Objects in JavaScript, on the other hand, are collections of key-value pairs. Here's an example of an object representing a contact's information:
+
+  @code javascript 
+    let agenda = {
+      name: "Neco", 
+      lastname: "Man", 
+      cellphone: "99 9999-9999",
+      completeName: function() {
+        return this.name + ' ' + this.lastname;  
+      }
+    }
+  @end
+
+  In this object, `name`, `lastname`, and `cellphone` are properties, and `completeName` is a method that returns the full name by combining the `name` and `lastname` properties. 
+
+  To access the values in an object, you can use dot notation or bracket notation:
+
+  @code javascript
+    console.log(agenda.name);      // Outputs "Neco"
+    console.log(agenda.lastname);  // Outputs "Man"
+    console.log(agenda.cellphone); // Outputs "99 9999-9999"
+    console.log(agenda.completeName()); // Outputs "Neco Man"
+  @end
+
+  You can also modify the values of an object's properties:
+
+  @code javascript
+    agenda.name = "Matheus"; 
+    agenda.lastname = "Lima";
+    console.log(agenda.completeName()); // Outputs "Matheus Lima"
+  @end
+
+  Objects are very flexible and allow you to store and manipulate complex data in a structured way.
+
