@@ -224,6 +224,10 @@ function processLinks(text: string): string {
             href = href.slice(0, -1); 
         }
 
+        if (href.endsWith(".norg")) {
+            href = href.replace(".norg", ".html");
+        }
+
         result += text.slice(i, linkStart);
         result += `<a href="${escapeHtml(href)}">${escapeHtml(linkText)}</a>`;
         i = hrefEnd + 1;
@@ -231,6 +235,7 @@ function processLinks(text: string): string {
 
     return result;
 }
+
 
 function processTable(content: string): string {
     const rows = content.trim().split("\n");
