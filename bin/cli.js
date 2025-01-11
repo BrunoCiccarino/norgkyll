@@ -102,22 +102,22 @@ function generateSite() {
                 console.log("⚠ No directories with .norg files found.");
                 return;
             }
+            const rootOutputDir = (0, path_1.join)(process.cwd(), "dist");
+            yield fs_1.promises.mkdir(rootOutputDir, { recursive: true });
             for (const dir of directoriesWithNorg) {
                 console.log(`🔄 Generating site for directory: ${dir}`);
-                const outputDir = (0, path_1.join)(dir, "dist");
-                yield fs_1.promises.mkdir(outputDir, { recursive: true });
                 const files = (yield fs_1.promises.readdir(dir)).filter((file) => file.endsWith(".norg"));
                 for (const file of files) {
                     const filePath = (0, path_1.join)(dir, file);
                     const content = yield fs_1.promises.readFile(filePath, "utf-8");
                     const title = file.replace(".norg", "");
                     const rendered = (0, render_1.renderPage)(content, title);
-                    const outputFilePath = (0, path_1.join)(outputDir, `${title}.html`);
+                    const outputFilePath = (0, path_1.join)(rootOutputDir, `${title}.html`);
                     yield fs_1.promises.writeFile(outputFilePath, rendered, "utf-8");
                     console.log(`✔ Generated: ${outputFilePath}`);
                 }
-                yield copyStaticAssets(outputDir);
             }
+            yield copyStaticAssets(rootOutputDir);
             console.log("🎉 Site generation complete for all directories!");
         }
         catch (err) {

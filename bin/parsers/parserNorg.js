@@ -64,7 +64,6 @@ function parseNorgToHtml(norgContent) {
             }
             const listItemContent = line.trim().slice(2);
             if (/\[.*?\]\{.*?\}/.test(listItemContent)) {
-                // Processa links no conteúdo da lista
                 const processedContent = processLinks(listItemContent);
                 html += `<li>${processedContent}</li>\n`;
             }
@@ -195,6 +194,9 @@ function processLinks(text) {
         if (href.endsWith("!")) {
             href = href.slice(0, -1);
         }
+        if (href.endsWith(".norg")) {
+            href = href.replace(".norg", ".html");
+        }
         result += text.slice(i, linkStart);
         result += `<a href="${escapeHtml(href)}">${escapeHtml(linkText)}</a>`;
         i = hrefEnd + 1;
@@ -228,28 +230,39 @@ function processTable(content) {
     html += "</tbody>\n</table>\n";
     return html;
 }
-function processInlineMarkup(text) {
-    let result = text;
+function processInlineMarkup(input) {
+    let result = input;
     result = replaceMarkup(result, "*", "strong");
     result = replaceMarkup(result, "/", "em");
     result = replaceMarkup(result, "_", "u");
+    result = replaceMarkup(result, "-", "del");
+    result = replaceMarkup(result, "!", "span", "spoiler");
+    result = replaceMarkup(result, "`", "code");
     result = replaceMarkup(result, "^", "sup");
     result = replaceMarkup(result, ",", "sub");
-    result = processLinks(result);
+    result = replaceMarkup(result, "$", "span", "math");
+    result = replaceMarkup(result, "&", "span", "variable");
+    result = replaceMarkup(result, "%", "span", "comment");
     return result;
 }
-function replaceMarkup(text, symbol, tag) {
-    while (true) {
-        const start = text.indexOf(symbol);
-        if (start === -1)
-            break;
-        const end = text.indexOf(symbol, start + 1);
-        if (end === -1)
-            break;
-        const content = text.slice(start + 1, end);
-        text = text.slice(0, start) + `<${tag}>${content}</${tag}>` + text.slice(end + 1);
+function replaceMarkup(text, symbol, tag, className) {
+    const openTag = className ? `<${tag} class="${className}">` : `<${tag}>`;
+    const closeTag = `</${tag}>`;
+    const count = text.split(symbol).length - 1;
+    if (count % 2 !== 0)
+        return text;
+    let result = "";
+    let insideMarkup = false;
+    for (let i = 0; i < text.length; i++) {
+        if (text[i] === symbol) {
+            insideMarkup = !insideMarkup;
+            result += insideMarkup ? openTag : closeTag;
+        }
+        else {
+            result += text[i];
+        }
     }
-    return text;
+    return result;
 }
 function getTaskStateClass(state) {
     switch (state) {

@@ -73,7 +73,7 @@ export function parseNorgToHtml(norgContent: string): string {
             }
             const listItemContent = line.trim().slice(2);
             if (/\[.*?\]\{.*?\}/.test(listItemContent)) {
-                // Processa links no conteúdo da lista
+
                 const processedContent = processLinks(listItemContent);
                 html += `<li>${processedContent}</li>\n`;
             } else {
@@ -268,28 +268,43 @@ function processTable(content: string): string {
     return html;
 }
 
-function processInlineMarkup(text: string): string {
-    let result = text;
+function processInlineMarkup(input: string): string {
+    let result = input;
     result = replaceMarkup(result, "*", "strong");
     result = replaceMarkup(result, "/", "em");
     result = replaceMarkup(result, "_", "u");
+    result = replaceMarkup(result, "-", "del");
+    result = replaceMarkup(result, "!", "span", "spoiler");
+    result = replaceMarkup(result, "`", "code"); 
     result = replaceMarkup(result, "^", "sup");
     result = replaceMarkup(result, ",", "sub");
-    result = processLinks(result);
+    result = replaceMarkup(result, "$", "span", "math");
+    result = replaceMarkup(result, "&", "span", "variable");
+    result = replaceMarkup(result, "%", "span", "comment");
     return result;
 }
 
-function replaceMarkup(text: string, symbol: string, tag: string): string {
- 
-    while (true) {
-        const start = text.indexOf(symbol);
-        if (start === -1) break;
-        const end = text.indexOf(symbol, start + 1);
-        if (end === -1) break;
-        const content = text.slice(start + 1, end);
-        text = text.slice(0, start) + `<${tag}>${content}</${tag}>` + text.slice(end + 1);
+function replaceMarkup(text: string, symbol: string, tag: string, className?: string): string {
+    const openTag = className ? `<${tag} class="${className}">` : `<${tag}>`;
+    const closeTag = `</${tag}>`;
+
+
+    const count = text.split(symbol).length - 1;
+    if (count % 2 !== 0) return text; 
+
+    let result = "";
+    let insideMarkup = false;
+
+    for (let i = 0; i < text.length; i++) {
+        if (text[i] === symbol) {
+            insideMarkup = !insideMarkup;
+            result += insideMarkup ? openTag : closeTag;
+        } else {
+            result += text[i];
+        }
     }
-    return text;
+
+    return result;
 }
 
 function getTaskStateClass(state: TaskState): string {
