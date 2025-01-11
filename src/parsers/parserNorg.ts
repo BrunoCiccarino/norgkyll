@@ -81,7 +81,19 @@ export function parseNorgToHtml(norgContent: string): string {
             }
             continue;
         }
-        
+
+        const imageProcessed = processImages(line);
+        if (imageProcessed !== line) {
+            html += imageProcessed + "\n";
+            continue;
+        }
+
+        const styledContent = processInlineStyles(line);
+        if (styledContent !== line) {
+            html += styledContent + "\n";
+            continue;
+        }
+                
         if (line.trim().startsWith("~ ")) {
             if (!stack.includes("ol")) {
                 stack.push("ol");
@@ -302,6 +314,160 @@ function replaceMarkup(text: string, symbol: string, tag: string, className?: st
         } else {
             result += text[i];
         }
+    }
+
+    return result;
+}
+
+function isDarkColor(hexColor: string): boolean {
+    if (hexColor.startsWith("#")) {
+        hexColor = hexColor.slice(1);
+    }
+    if (hexColor.length === 3) {
+        hexColor = hexColor.split("").map(c => c + c).join("");
+    }
+    const r = parseInt(hexColor.slice(0, 2), 16);
+    const g = parseInt(hexColor.slice(2, 4), 16);
+    const b = parseInt(hexColor.slice(4, 6), 16);
+
+
+    const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return brightness < 0.5; 
+}
+
+function processImages(input: string): string {
+    const imageRegex = /@image\s+(png|svg|jpeg|jfif|exif)\n([\s\S]+?)\n@end/g;
+    const externalMediaRegex = /\.image\s+(https?:\/\/[^\s]+)((?:\s+\+width\s+"[\d]+px"|\s+\+height\s+"[\d]+px")*)/g;
+
+    let result: string = input;
+
+    result = result.replace(imageRegex, (_, format: string, base64Data: string) => {
+        return `<img src="data:image/${format};base64,${base64Data.trim()}" alt="Embedded image" />`;
+    });
+
+    result = result.replace(externalMediaRegex, (_, url: string, styles: string) => {
+        let styleAttributes: string = "";
+        if (styles) {
+            const sizeRegex = /\+(width|height)\s+"(\d+px)"/g;
+            let match: RegExpExecArray | null;
+            while ((match = sizeRegex.exec(styles)) !== null) {
+                styleAttributes += `${match[1]}: ${match[2]}; `;
+            }
+        }
+
+        if (/\.(mp4|webm|ogg)$/.test(url)) {
+            return `<video controls style="${styleAttributes.trim()}"><source src="${url}" type="video/${url.split('.').pop()}">Your browser does not support the video tag.</video>`;
+        } else if (/\.(png|jpg|jpeg|svg|gif)$/.test(url)) {
+            return `<img src="${url}" alt="External media" style="${styleAttributes.trim()}" />`;
+        }
+        return "";
+    });
+
+    return result;
+}
+
+function processInlineStyles(input: string): string {
+    const styleRegex = /\+([a-z_]+)(?:\s+([a-fA-F0-9#]+|[a-z]+))?/g;
+    let globalStyles: string[] = [];
+    let inlineStyles: string[] = [];
+    let result: string = input;
+
+    result = result.replace(styleRegex, (_, styleKey: string, value: string | undefined) => {
+        switch (styleKey) {
+            case "center":
+                globalStyles.push(`
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        margin: 0;
+                    }
+                    main {
+                        flex: 1; 
+                    }
+                `);
+                return "";
+            case "background_color":
+                if (value) {
+                    const darkBackground: boolean = isDarkColor(value);
+                    globalStyles.push(`body { background-color: ${value}; }`);
+                    if (darkBackground) {
+                        globalStyles.push(`body { color: #FFFFFF; }`);
+                        globalStyles.push(`
+                            h1, h2, h3, h4, h5, h6 {
+                                color: #FFFFFF;
+                            }
+                            footer {
+                                color: #FFFFFF;
+                            }
+                            table {
+                                background-color: ${value};
+                                color: #FFFFFF;
+                            }
+                            table th {
+                                background-color: ${value}; 
+                                font-weight: bold; 
+                            }
+                            table tr:nth-child(odd) {
+                                background-color: ${value};
+                                color: #FFFFFF;
+                            }
+                            table tr:nth-child(even) {
+                                background-color: ${value};
+                                color: #FFFFFF;
+                            }                            
+                        `);
+                    } else {
+                        globalStyles.push(`
+                            table {
+                                background-color: ${value};
+                                color: #000000;
+                            }
+                            table tr:nth-child(odd) {
+                                background-color: #DDDDDD;
+                                color: #000000;
+                            }
+                            table tr:nth-child(even) {
+                                background-color: #EEEEEE;
+                                color: #000000;
+                            }
+                        `);
+                    }
+                }
+                return "";
+            case "align_items":
+                if (value) {
+                    const alignments: Record<string, string> = {
+                        left: "flex-start",
+                        right: "flex-end",
+                        up: "flex-start",
+                        down: "flex-end",
+                        center: "center",
+                    };
+                    const cssValue: string = alignments[value] || value;
+                    globalStyles.push(`body { align-items: ${cssValue}; }`);
+                }
+                return "";
+            default:
+                if (value) {
+                    inlineStyles.push(`${styleKey}: ${value};`);
+                }
+                return "";
+        }
+    });
+
+    result = result.replace(/<title>.*?<\/title>/g, "");
+
+    if (globalStyles.length > 0) {
+        const globalStyleBlock: string = `<style>${globalStyles.join("\n")}</style>\n`;
+        result = globalStyleBlock + result;
+    }
+
+    if (inlineStyles.length > 0) {
+        const inlineStyleBlock: string = inlineStyles.join(" ");
+        result = `<div style="${inlineStyleBlock}">${result}</div>`;
     }
 
     return result;

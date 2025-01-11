@@ -13,9 +13,6 @@ const TEMPLATE = `
     <link rel="stylesheet" href="highlight.css">
 </head>
 <body>
-    <header>
-        <h1>{{title}}</h1>
-    </header>
     <main>
         {{{content}}}
     </main>

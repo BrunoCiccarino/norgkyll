@@ -72,6 +72,16 @@ function parseNorgToHtml(norgContent) {
             }
             continue;
         }
+        const imageProcessed = processImages(line);
+        if (imageProcessed !== line) {
+            html += imageProcessed + "\n";
+            continue;
+        }
+        const styledContent = processInlineStyles(line);
+        if (styledContent !== line) {
+            html += styledContent + "\n";
+            continue;
+        }
         if (line.trim().startsWith("~ ")) {
             if (!stack.includes("ol")) {
                 stack.push("ol");
@@ -129,7 +139,7 @@ function parseNorgToHtml(norgContent) {
             if (taskStateEnd !== -1) {
                 const state = line.slice(2, taskStateEnd + 1);
                 if (!isValidTaskState(state)) {
-                    //    console.warn(`Invalid task state: ${state}`);
+                    console.error(`Invalid task state: ${state}`);
                     continue;
                 }
                 const taskText = line.slice(taskStateEnd + 2).trim();
@@ -253,42 +263,155 @@ function replaceMarkup(text, symbol, tag, className) {
         return text;
     let result = "";
     let insideMarkup = false;
-    let insideList = false;
-    let currentListTag = "";
-    const lines = text.split(/\r?\n/);
-    for (let line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith("* ") || trimmedLine.startsWith("- ")) {
-            const listTag = trimmedLine.startsWith("* ") ? "ul" : "ol";
-            if (!insideList || currentListTag !== listTag) {
-                if (insideList) {
-                    result += `</${currentListTag}>`;
-                }
-                currentListTag = listTag;
-                result += `<${currentListTag}>`;
-                insideList = true;
-            }
-            result += `<li>${trimmedLine.slice(2)}</li>`;
+    for (let i = 0; i < text.length; i++) {
+        if (text[i] === symbol) {
+            insideMarkup = !insideMarkup;
+            result += insideMarkup ? openTag : closeTag;
         }
         else {
-            if (insideList) {
-                result += `</${currentListTag}>`;
-                insideList = false;
-            }
-            for (let i = 0; i < line.length; i++) {
-                if (line[i] === symbol) {
-                    insideMarkup = !insideMarkup;
-                    result += insideMarkup ? openTag : closeTag;
-                }
-                else {
-                    result += line[i];
-                }
-            }
-            result += "\n";
+            result += text[i];
         }
     }
-    if (insideList) {
-        result += `</${currentListTag}>`;
+    return result;
+}
+function isDarkColor(hexColor) {
+    if (hexColor.startsWith("#")) {
+        hexColor = hexColor.slice(1);
+    }
+    if (hexColor.length === 3) {
+        hexColor = hexColor.split("").map(c => c + c).join("");
+    }
+    const r = parseInt(hexColor.slice(0, 2), 16);
+    const g = parseInt(hexColor.slice(2, 4), 16);
+    const b = parseInt(hexColor.slice(4, 6), 16);
+    const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return brightness < 0.5;
+}
+function processImages(input) {
+    const imageRegex = /@image\s+(png|svg|jpeg|jfif|exif)\n([\s\S]+?)\n@end/g;
+    const externalMediaRegex = /\.image\s+(https?:\/\/[^\s]+)((?:\s+\+width\s+"[\d]+px"|\s+\+height\s+"[\d]+px")*)/g;
+    let result = input;
+    result = result.replace(imageRegex, (_, format, base64Data) => {
+        return `<img src="data:image/${format};base64,${base64Data.trim()}" alt="Embedded image" />`;
+    });
+    result = result.replace(externalMediaRegex, (_, url, styles) => {
+        let styleAttributes = "";
+        if (styles) {
+            const sizeRegex = /\+(width|height)\s+"(\d+px)"/g;
+            let match;
+            while ((match = sizeRegex.exec(styles)) !== null) {
+                styleAttributes += `${match[1]}: ${match[2]}; `;
+            }
+        }
+        if (/\.(mp4|webm|ogg)$/.test(url)) {
+            return `<video controls style="${styleAttributes.trim()}"><source src="${url}" type="video/${url.split('.').pop()}">Your browser does not support the video tag.</video>`;
+        }
+        else if (/\.(png|jpg|jpeg|svg|gif)$/.test(url)) {
+            return `<img src="${url}" alt="External media" style="${styleAttributes.trim()}" />`;
+        }
+        return "";
+    });
+    return result;
+}
+function processInlineStyles(input) {
+    const styleRegex = /\+([a-z_]+)(?:\s+([a-fA-F0-9#]+|[a-z]+))?/g;
+    let globalStyles = [];
+    let inlineStyles = [];
+    let result = input;
+    result = result.replace(styleRegex, (_, styleKey, value) => {
+        switch (styleKey) {
+            case "center":
+                globalStyles.push(`
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        margin: 0;
+                    }
+                    main {
+                        flex: 1; 
+                    }
+                `);
+                return "";
+            case "background_color":
+                if (value) {
+                    const darkBackground = isDarkColor(value);
+                    globalStyles.push(`body { background-color: ${value}; }`);
+                    if (darkBackground) {
+                        globalStyles.push(`body { color: #FFFFFF; }`);
+                        globalStyles.push(`
+                            h1, h2, h3, h4, h5, h6 {
+                                color: #FFFFFF;
+                            }
+                            footer {
+                                color: #FFFFFF;
+                            }
+                            table {
+                                background-color: ${value};
+                                color: #FFFFFF;
+                            }
+                            table th {
+                                background-color: ${value}; 
+                                font-weight: bold; 
+                            }
+                            table tr:nth-child(odd) {
+                                background-color: ${value};
+                                color: #FFFFFF;
+                            }
+                            table tr:nth-child(even) {
+                                background-color: ${value};
+                                color: #FFFFFF;
+                            }                            
+                        `);
+                    }
+                    else {
+                        globalStyles.push(`
+                            table {
+                                background-color: ${value};
+                                color: #000000;
+                            }
+                            table tr:nth-child(odd) {
+                                background-color: #DDDDDD;
+                                color: #000000;
+                            }
+                            table tr:nth-child(even) {
+                                background-color: #EEEEEE;
+                                color: #000000;
+                            }
+                        `);
+                    }
+                }
+                return "";
+            case "align_items":
+                if (value) {
+                    const alignments = {
+                        left: "flex-start",
+                        right: "flex-end",
+                        up: "flex-start",
+                        down: "flex-end",
+                        center: "center",
+                    };
+                    const cssValue = alignments[value] || value;
+                    globalStyles.push(`body { align-items: ${cssValue}; }`);
+                }
+                return "";
+            default:
+                if (value) {
+                    inlineStyles.push(`${styleKey}: ${value};`);
+                }
+                return "";
+        }
+    });
+    result = result.replace(/<title>.*?<\/title>/g, "");
+    if (globalStyles.length > 0) {
+        const globalStyleBlock = `<style>${globalStyles.join("\n")}</style>\n`;
+        result = globalStyleBlock + result;
+    }
+    if (inlineStyles.length > 0) {
+        const inlineStyleBlock = inlineStyles.join(" ");
+        result = `<div style="${inlineStyleBlock}">${result}</div>`;
     }
     return result;
 }
