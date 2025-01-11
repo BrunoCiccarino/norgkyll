@@ -145,7 +145,7 @@ export function parseNorgToHtml(norgContent: string): string {
             if (taskStateEnd !== -1) {
                 const state = line.slice(2, taskStateEnd + 1) as TaskState;
                if (!isValidTaskState(state)) {
-                //    console.warn(`Invalid task state: ${state}`);
+                   console.error(`Invalid task state: ${state}`);
                    continue;
                }
                 const taskText = line.slice(taskStateEnd + 2).trim();

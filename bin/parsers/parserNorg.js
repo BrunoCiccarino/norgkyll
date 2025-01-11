@@ -253,14 +253,42 @@ function replaceMarkup(text, symbol, tag, className) {
         return text;
     let result = "";
     let insideMarkup = false;
-    for (let i = 0; i < text.length; i++) {
-        if (text[i] === symbol) {
-            insideMarkup = !insideMarkup;
-            result += insideMarkup ? openTag : closeTag;
+    let insideList = false;
+    let currentListTag = "";
+    const lines = text.split(/\r?\n/);
+    for (let line of lines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith("* ") || trimmedLine.startsWith("- ")) {
+            const listTag = trimmedLine.startsWith("* ") ? "ul" : "ol";
+            if (!insideList || currentListTag !== listTag) {
+                if (insideList) {
+                    result += `</${currentListTag}>`;
+                }
+                currentListTag = listTag;
+                result += `<${currentListTag}>`;
+                insideList = true;
+            }
+            result += `<li>${trimmedLine.slice(2)}</li>`;
         }
         else {
-            result += text[i];
+            if (insideList) {
+                result += `</${currentListTag}>`;
+                insideList = false;
+            }
+            for (let i = 0; i < line.length; i++) {
+                if (line[i] === symbol) {
+                    insideMarkup = !insideMarkup;
+                    result += insideMarkup ? openTag : closeTag;
+                }
+                else {
+                    result += line[i];
+                }
+            }
+            result += "\n";
         }
+    }
+    if (insideList) {
+        result += `</${currentListTag}>`;
     }
     return result;
 }
