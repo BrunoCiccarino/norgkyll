@@ -33,13 +33,14 @@ Here in this session you will learn the basics of neorg so you can build your ow
 ### Heading
 
   We have 6 heading levels and they are defined with *, it has this syntax:
-
-  * Heading level 1 <br>
-  ** Heading level 2 <br>
-  *** Heading level 3 <br>
-  **** Heading level 4 <br>
-  ***** Heading level 5 <br>
-  ****** Heading level 6 <br>
+```
+  * Heading level 1 
+  ** Heading level 2 
+  *** Heading level 3 
+  **** Heading level 4 
+  ***** Heading level 5 
+  ****** Heading level 6 
+```
 
 ### Unordered lists
 
