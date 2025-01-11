@@ -348,6 +348,12 @@ function processInlineStyles(input) {
                             footer {
                                 color: #FFFFFF;
                             }
+                            a:link {
+                                color: #50fa7b;
+                            }
+                            a:visited {
+                                color: #7dcfff;
+                            }
                             table {
                                 background-color: ${value};
                                 color: #FFFFFF;
