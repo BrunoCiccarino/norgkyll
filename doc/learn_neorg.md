@@ -72,3 +72,49 @@ Here in this session you will learn the basics of neorg so you can build your ow
     - (-) Pending -> currently in progress
     - (=) Task put on hold
     - (_) Task cancelled (put down)
+
+### Code block
+
+  ```
+  @code lua
+    if op == "+" then
+      r = a + b
+    elseif op == "-" then
+      r = a - b
+    elseif op == "*" then
+      r = a*b
+    elseif op == "/" then
+      r = a/b
+    else
+      error("invalid operation")
+     end  
+     @end       
+  ```
+
+### Table
+  
+   @table
+      | Head a | Head b | Head c |
+      | -      | -      | -      |
+      | Cell 1 | Cell 2 | Cell 3 |
+      | Cell 4 | Cell 5 | Cell 6 |
+   @end
+
+### Styling
+
+  We recently released a feature that allows you to style the page that compiles to css, and these features so far are
+  ```
+  +center
+  +background_color
+  +width
+  +height
+  ```
+
+  Example:
+    If you want to center the content of a page you use center globally, if you want to change the background color you use background color with the color in hexadecimal behind the background color
+    
+    like this: +background_color #FFFFFF
+    
+    if you want to change the size of an image for example, you can use something like this:
+    
+    .image https://raw.githubusercontent.com/nvim-neorg/neorg/main/res/neorg.svg +width "100px" +height "100px"
