@@ -289,7 +289,8 @@ function isDarkColor(hexColor) {
 }
 function processImages(input) {
     const imageRegex = /@image\s+(png|svg|jpeg|jfif|exif)\n([\s\S]+?)\n@end/g;
-    const externalMediaRegex = /\.image\s+(https?:\/\/[^\s]+)((?:\s+\+width\s+"[\d]+px"|\s+\+height\s+"[\d]+px")*)/g;
+    const externalMediaRegex = /\.image\s+(https?:\/\/[^\s]+)((?:\s+\+width\s+\"[\d]+px\"|\s+\+height\s+\"[\d]+px\")*)/g;
+    const localImageRegex = /\.image\s+([^\s]+)((?:\s+\+width\s+\"[\d]+px\"|\s+\+height\s+\"[\d]+px\")*)/g;
     let result = input;
     result = result.replace(imageRegex, (_, format, base64Data) => {
         return `<img src="data:image/${format};base64,${base64Data.trim()}" alt="Embedded image" />`;
@@ -297,7 +298,7 @@ function processImages(input) {
     result = result.replace(externalMediaRegex, (_, url, styles) => {
         let styleAttributes = "";
         if (styles) {
-            const sizeRegex = /\+(width|height)\s+"(\d+px)"/g;
+            const sizeRegex = /\+(width|height)\s+\"(\d+px)\"/g;
             let match;
             while ((match = sizeRegex.exec(styles)) !== null) {
                 styleAttributes += `${match[1]}: ${match[2]}; `;
@@ -310,6 +311,17 @@ function processImages(input) {
             return `<img src="${url}" alt="External media" style="${styleAttributes.trim()}" />`;
         }
         return "";
+    });
+    result = result.replace(localImageRegex, (_, path, styles) => {
+        let styleAttributes = "";
+        if (styles) {
+            const sizeRegex = /\+(width|height)\s+\"(\d+px)\"/g;
+            let match;
+            while ((match = sizeRegex.exec(styles)) !== null) {
+                styleAttributes += `${match[1]}: ${match[2]}; `;
+            }
+        }
+        return `<img src="${path}" alt="Local image" style="${styleAttributes.trim()}" />`;
     });
     return result;
 }
