@@ -1,84 +1,81 @@
-/*!
-  Theme: Nekonight
-  Description: Highlight.js theme style
-  Author: (c) Bruno Ciccarino <brunociccarinoo@gmail.com>
-  License: see project LICENSE
-  Touched: 2025
-*/
-pre code.hljs {
+/* Dracula Theme v1.2.5
+ *
+ * https://github.com/dracula/highlightjs
+ *
+ * Copyright 2016-present, All rights reserved
+ *
+ * Code licensed under the MIT license
+ *
+ * @author Denis Ciccale <dciccale@gmail.com>
+ * @author Zeno Rocha <hi@zenorocha.com>
+ */
+
+.hljs {
   display: block;
   overflow-x: auto;
-  padding: 1em;
+  padding: 0.5em;
+  background: #282a36;
 }
-code.hljs {
-  padding: 3px 5px;
-}
-.hljs {
-  background: #f3f3f3;
-  color: #444;
-}
-.hljs-comment {
-  color: #697070;
-}
-.hljs-punctuation,
-.hljs-tag {
-  color: #444a;
-}
-.hljs-tag .hljs-attr,
-.hljs-tag .hljs-name {
-  color: #444;
-}
-.hljs-attribute,
-.hljs-doctag,
-.hljs-keyword,
-.hljs-meta .hljs-keyword,
-.hljs-name,
-.hljs-selector-tag {
-  font-weight: 700;
-}
-.hljs-deletion,
-.hljs-number,
-.hljs-quote,
-.hljs-selector-class,
-.hljs-selector-id,
-.hljs-string,
-.hljs-template-tag,
-.hljs-type {
-  color: #FAD000;
-}
-.hljs-section,
-.hljs-title {
-  color: #FAD000;
-  font-weight: 700;
-}
-.hljs-link,
-.hljs-operator,
-.hljs-regexp,
-.hljs-selector-attr,
-.hljs-selector-pseudo,
-.hljs-symbol,
-.hljs-template-variable,
-.hljs-variable {
-  color: #9EFFFF;
-}
-.hljs-literal {
-  color: #82aaff;
-}
-.hljs-addition,
+
 .hljs-built_in,
+.hljs-selector-tag,
+.hljs-section,
+.hljs-link {
+  color: #8be9fd;
+}
+
+.hljs-keyword {
+  color: #ff79c6;
+}
+
+.hljs,
+.hljs-subst {
+  color: #f8f8f2;
+}
+
+.hljs-title,
+.hljs-attr,
+.hljs-meta-keyword {
+  font-style: italic;
+  color: #50fa7b;
+}
+
+.hljs-string,
+.hljs-meta,
+.hljs-name,
+.hljs-type,
+.hljs-symbol,
 .hljs-bullet,
-.hljs-code {
-  color: #82aaff;
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: #f1fa8c;
 }
-.hljs-meta {
-  color: #1f7199;
+
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion {
+  color: #6272a4;
 }
-.hljs-meta .hljs-string {
-  color: #38a;
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-type,
+.hljs-name,
+.hljs-strong {
+  font-weight: bold;
 }
+
+.hljs-literal,
+.hljs-number {
+  color: #bd93f9;
+}
+
 .hljs-emphasis {
   font-style: italic;
-}
-.hljs-strong {
-  font-weight: 700;
 }
