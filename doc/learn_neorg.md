@@ -112,9 +112,9 @@ Here in this session you will learn the basics of neorg so you can build your ow
 
   Example:
     If you want to center the content of a page you use center globally, if you want to change the background color you use background color with the color in hexadecimal behind the background color
-    
-    like this: +background_color #FFFFFF
-    
+
+    like this: `+background_color #FFFFFF`
+
     if you want to change the size of an image for example, you can use something like this:
-    
-    .image https://raw.githubusercontent.com/nvim-neorg/neorg/main/res/neorg.svg +width "100px" +height "100px"
+
+    `.image https://raw.githubusercontent.com/nvim-neorg/neorg/main/res/neorg.svg +width "100px" +height "100px"`
